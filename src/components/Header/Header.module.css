@@ -1,88 +1,82 @@
 
 .header {
+  position: relative;
+  z-index: 100;
   width: 100%;
   background-color: #fff;
-  position: relative;
-  z-index: 10;
 }
 
 .container {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   max-width: 1440px;
   min-height: 80px;
-  box-sizing: border-box;
   margin: 0 auto;
-  padding: 0 10.42%;
+  padding: 0 40px;
+  box-sizing: border-box;
 }
 
 .logo {
   display: flex;
-  flex-shrink: 0;
   align-items: center;
-  justify-content: center;
-  width: 82px;
-  height: 56px;
+  flex-shrink: 0;
 }
 
 .logo img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 140px;
+  max-width: 100%;
+  height: auto;
+}
+
+.menuToggle {
+  display: none;
 }
 
 .mobilePanel {
   display: flex;
   align-items: center;
-  flex: 1;
-  min-width: 0;
+  gap: 40px;
 }
 
 .navigation {
   display: flex;
   align-items: center;
-  gap: clamp(20px, 3vw, 42px);
-  margin-left: clamp(32px, 5vw, 72px);
+  gap: 32px;
 }
 
 .navigation a {
-  color: #000;
-  font-family: "Montserrat Alternates", sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
+  color: #222;
+  font-size: 14px;
   text-decoration: none;
-  white-space: nowrap;
-  transition: opacity 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .navigation a:hover {
-  opacity: 0.65;
+  color: #ff9c45;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 27px;
-  margin-left: auto;
+  gap: 16px;
 }
 
 .signUp {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 89px;
-  height: 35px;
-  padding: 0 16px;
-  box-sizing: border-box;
+  min-height: 42px;
+  padding: 10px 24px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   background-color: #ffb36c;
   color: #000;
-  font-family: "Montserrat Alternates", sans-serif;
-  font-size: 12px;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -92,60 +86,152 @@
   background-color: #ffa451;
 }
 
+.userName {
+  max-width: 160px;
+  overflow: hidden;
+  color: #222;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .profile {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   padding: 0;
-  overflow: hidden;
   border: none;
   border-radius: 50%;
-  background: transparent;
+  background-color: transparent;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profile:hover {
+  background-color: #f5f5f5;
 }
 
 .profile img {
   display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* Затемнение под окном профиля */
+.profileBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: rgb(0 0 0 / 45%);
+}
+
+/* Окно профиля */
+.profileModal {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 380px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 32px;
+  border-radius: 16px;
+  background-color: #fff;
+  color: #222;
+  font-family: "Montserrat Alternates", sans-serif;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 15%);
 }
 
-.menuToggle {
-  display: none;
+.profileModal h2 {
+  margin: 0 0 24px;
+  color: #222;
+  font-size: 24px;
+  font-weight: 600;
 }
 
-/* Планшеты */
-@media (max-width: 1024px) {
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.profileInfo p {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.profileInfo strong {
+  color: #555;
+  font-weight: 600;
+}
+
+.profileInfo span {
+  color: #222;
+}
+
+/* Кнопка закрытия окна */
+.profileClose {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.profileClose:hover {
+  color: #ff9c45;
+}
+
+/* Кнопка выхода в профиле */
+.profileLogout {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #ffb36c;
+  color: #000;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profileLogout:hover {
+  background-color: #ffa451;
+}
+
+/* Планшеты и мобильные устройства */
+@media (max-width: 768px) {
   .container {
-    padding: 0 5%;
+    min-height: 70px;
+    padding: 0 20px;
   }
 
-  .navigation {
-    gap: 24px;
-    margin-left: 40px;
-  }
-
-  .actions {
-    gap: 18px;
-  }
-}
-
-/* Мобильные устройства */
-@media (max-width: 640px) {
-  .container {
-    position: relative;
-    min-height: 72px;
-    padding: 8px 20px;
-    justify-content: space-between;
-  }
-
-  .logo {
-    width: 70px;
-    height: 48px;
+  .logo img {
+    width: 120px;
   }
 
   .menuToggle {
@@ -153,14 +239,12 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    margin-left: auto;
-    padding: 10px 0 10px 12px;
+    padding: 10px 0 10px 10px;
     border: none;
     background: transparent;
-    color: #000;
-    font-family: "Montserrat Alternates", sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+    color: #222;
+    font-family: inherit;
+    font-size: 14px;
     cursor: pointer;
   }
 
@@ -175,87 +259,67 @@
   }
 
   .arrowOpen {
-    transform: rotate(225deg) translate(-2px, -1px);
+    transform: rotate(225deg) translate(-2px, -2px);
   }
 
   .mobilePanel {
-    display: none;
     position: absolute;
-    top: calc(100% + 6px);
-    left: 12px;
-    right: 12px;
-    z-index: 20;
-
-    width: auto;
-    min-width: 0;
-    box-sizing: border-box;
-    padding: 12px 20px 16px;
-
-    flex-direction: column;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
     align-items: stretch;
-
+    gap: 24px;
+    padding: 24px 20px;
+    border-top: 1px solid #eee;
     background-color: #fff;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
+    box-shadow: 0 12px 20px rgb(0 0 0 / 8%);
   }
 
   .mobilePanelOpen {
     display: flex;
+    flex-direction: column;
   }
 
   .navigation {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 100%;
-    gap: 0;
-    margin: 0;
+    gap: 20px;
   }
 
   .navigation a {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 13px 0;
-    text-align: left;
-    white-space: normal;
-    border-bottom: 1px solid #eee;
+    font-size: 15px;
   }
 
   .actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    box-sizing: border-box;
-    gap: 14px;
-    margin: 12px 0 0;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
-  }
-
-  .signUp {
-    flex-shrink: 0;
-  }
-
-  .profile {
-    width: 44px;
-    height: 44px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
   }
 }
 
-/* Очень узкие экраны */
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .container {
-    padding-right: 14px;
-    padding-left: 14px;
+    min-height: 64px;
+    padding: 0 16px;
   }
 
-  .mobilePanel {
-    left: 8px;
-    right: 8px;
-    padding-right: 16px;
-    padding-left: 16px;
+  .logo img {
+    width: 105px;
+  }
+
+  .profileModal {
+    padding: 28px 22px 24px;
+    border-radius: 12px;
+  }
+
+  .profileModal h2 {
+    font-size: 21px;
+  }
+
+  .userName {
+    max-width: 110px;
   }
 }
+

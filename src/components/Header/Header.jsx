@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Header.module.css";
 import Modal from "../Modal/Modal";
 
@@ -12,6 +12,36 @@ const userUrl =
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+
+    try {
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
+  });
+
+  // Закрытие окон по Escape
+  useEffect(() => {
+    if (!isModalOpen && !isProfileOpen) return;
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsModalOpen(false);
+        setIsProfileOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isModalOpen, isProfileOpen]);
 
   const handleMenuToggle = () => {
     setIsMenuOpen((prev) => !prev);
@@ -21,9 +51,36 @@ function Header() {
     setIsMenuOpen(false);
   };
 
-  const handleRegister = (user) => {
-    console.log("Registered user:", user);
+  // Регистрация
+  const handleRegister = (newUser) => {
+    localStorage.setItem("user", JSON.stringify(newUser));
+    setUser(newUser);
     setIsModalOpen(false);
+  };
+
+  // Выход из аккаунта
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setIsProfileOpen(false);
+  };
+
+  // Нажатие на иконку профиля
+  const handleProfileClick = () => {
+    setIsMenuOpen(false);
+
+    if (user) {
+      setIsProfileOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  // Закрытие профиля по клику на фон
+  const handleProfileBackdropClick = (event) => {
+    if (event.target === event.currentTarget) {
+      setIsProfileOpen(false);
+    }
   };
 
   return (
@@ -41,6 +98,7 @@ function Header() {
           aria-label="Toggle navigation menu"
         >
           <span>Menu</span>
+
           <span
             className={`${styles.arrow} ${
               isMenuOpen ? styles.arrowOpen : ""
@@ -68,21 +126,36 @@ function Header() {
           </nav>
 
           <div className={styles.actions}>
-            <button
-              className={styles.signUp}
-              type="button"
-              onClick={() => {
-                setIsMenuOpen(false);
-                setIsModalOpen(true);
-              }}
-            >
-              Sign Up
-            </button>
+            {user ? (
+              <>
+                <span className={styles.userName}>{user.name}</span>
+
+                <button
+                  className={styles.signUp}
+                  type="button"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <button
+                className={styles.signUp}
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsModalOpen(true);
+                }}
+              >
+                Sign Up
+              </button>
+            )}
 
             <button
               className={styles.profile}
               type="button"
               aria-label="User profile"
+              onClick={handleProfileClick}
             >
               <img src={userUrl} alt="" />
             </button>
@@ -90,11 +163,58 @@ function Header() {
         </div>
       </div>
 
+      {/* Окно регистрации */}
       {isModalOpen && (
         <Modal
           onClose={() => setIsModalOpen(false)}
           onRegister={handleRegister}
         />
+      )}
+
+      {/* Окно профиля */}
+      {isProfileOpen && user && (
+        <div
+          className={styles.profileBackdrop}
+          onClick={handleProfileBackdropClick}
+        >
+          <div
+            className={styles.profileModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profile-title"
+          >
+            <button
+              className={styles.profileClose}
+              type="button"
+              onClick={() => setIsProfileOpen(false)}
+              aria-label="Close profile"
+            >
+              &times;
+            </button>
+
+            <h2 id="profile-title">My account</h2>
+
+            <div className={styles.profileInfo}>
+              <p>
+                <strong>Name:</strong>
+                <span>{user.name}</span>
+              </p>
+
+              <p>
+                <strong>Email:</strong>
+                <span>{user.email}</span>
+              </p>
+            </div>
+
+            <button
+              className={styles.profileLogout}
+              type="button"
+              onClick={handleLogout}
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
       )}
     </header>
   );

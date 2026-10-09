@@ -1,0 +1,16 @@
+
+.hero {
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  font-size: 16px;
+}
