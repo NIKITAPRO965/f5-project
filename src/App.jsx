@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 
@@ -31,6 +32,7 @@ function getLocationKey(item) {
 function App() {
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
+  const [searchCity, setSearchCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [initialized, setInitialized] = useState(false);
@@ -68,9 +70,7 @@ function App() {
       setLoading(true);
 
       const results = await Promise.allSettled(
-        savedLocations.map((location) =>
-          fetchWeatherByCity(location)
-        )
+        savedLocations.map((location) => fetchWeatherByCity(location))
       );
 
       if (cancelled) return;
@@ -191,7 +191,10 @@ function App() {
       <Header />
 
       <main>
-        <Hero onSearch={handleSearch} />
+        <Hero
+          onSearch={handleSearch}
+          onCityChange={setSearchCity}
+        />
 
         {loading && (
           <p className="weatherMessage">Loading weather...</p>
@@ -250,13 +253,17 @@ function App() {
           </>
         )}
 
+        {(searchCity.trim() || selectedWeather) && (
+        <>
         <News
-        locationName={selectedWeather?.location.name || ""}
+        locationName={selectedWeather?.location.name || searchCity}
         />
 
         <NatureGallery
-        locationName={selectedWeather?.location.name || ""}
+        locationName={selectedWeather?.location.name || searchCity}
         />
+        </>
+        )}
       </main>
 
       <Footer />

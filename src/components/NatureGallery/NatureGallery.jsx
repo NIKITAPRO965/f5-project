@@ -5,7 +5,7 @@ import { searchCommonsImages } from "../../api/imageApi";
 
 function NatureGallery({ locationName = "" }) {
   const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -13,57 +13,58 @@ function NatureGallery({ locationName = "" }) {
     let cancelled = false;
 
     async function loadNatureImages() {
-      setLoading(true);
+      const city = locationName.trim();
+
+      setImages([]);
+      setActiveIndex(null);
       setError("");
 
-      const defaultQuery =
-        "nature OR forest OR ocean OR landscape OR ecology";
+      if (!city) {
+        setLoading(false);
+        return;
+      }
 
-      let query = locationName.trim()
-        ? `"${locationName.trim()}" AND (nature OR landscape OR ecology)`
-        : defaultQuery;
+      setLoading(true);
 
       try {
+        const query =
+          `${city} landscape OR ${city} nature OR ${city} scenery OR ${city} mountains OR ${city} lake OR ${city} waterfall`;
+
         let allImages = [];
-        let nextOffset = 0;
+        let offset = 0;
 
         for (let i = 0; i < 5; i++) {
-          let result = await searchCommonsImages(query, nextOffset);
+          const result = await searchCommonsImages(query, offset);
 
-          if (result.images.length === 0 && i === 0 && locationName.trim()) {
-            query = defaultQuery;
-            nextOffset = 0;
-            result = await searchCommonsImages(query, nextOffset);
-          }
-
-          const existingIds = new Set(allImages.map((image) => image.id));
-
-          allImages = [
-            ...allImages,
-            ...result.images.filter((image) => !existingIds.has(image.id)),
-          ].slice(0, 60);
+          allImages = [...allImages, ...result.images];
 
           if (
             result.nextOffset == null ||
-            result.nextOffset === nextOffset ||
+            result.nextOffset === offset ||
             allImages.length >= 60
           ) {
             break;
           }
 
-          nextOffset = result.nextOffset;
+          offset = result.nextOffset;
         }
 
         if (cancelled) return;
 
-        setImages(allImages);
+        const uniqueImages = Array.from(
+          new Map(
+            allImages.map((image) => [image.id, image])
+          ).values()
+        ).slice(0, 60);
 
-        if (allImages.length === 0) {
-          setError("No nature photos found.");
+        setImages(uniqueImages);
+
+        if (uniqueImages.length === 0) {
+          setError(`No landscape photos found for ${city}.`);
         }
       } catch {
         if (!cancelled) {
-          setError("Unable to load nature photos.");
+          setError("Unable to load landscape photos.");
         }
       } finally {
         if (!cancelled) {
@@ -80,7 +81,7 @@ function NatureGallery({ locationName = "" }) {
   }, [locationName]);
 
   useEffect(() => {
-    if (activeIndex === null) return;
+    if (activeIndex === null || images.length === 0) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -108,7 +109,9 @@ function NatureGallery({ locationName = "" }) {
   }, [activeIndex, images.length]);
 
   const showPrevious = () => {
-    setActiveIndex((index) => (index - 1 + images.length) % images.length);
+    setActiveIndex(
+      (index) => (index - 1 + images.length) % images.length
+    );
   };
 
   const showNext = () => {
@@ -118,8 +121,10 @@ function NatureGallery({ locationName = "" }) {
   if (loading) {
     return (
       <section className={styles.section}>
-        <h2 className={styles.title}>Nature & Ecology</h2>
-        <p className={styles.message}>Loading nature...</p>
+        <h2 className={styles.title}>Beautiful Nature</h2>
+        <p className={styles.message}>
+          Loading landscapes near {locationName}...
+        </p>
       </section>
     );
   }
@@ -127,7 +132,7 @@ function NatureGallery({ locationName = "" }) {
   if (error || images.length === 0) {
     return (
       <section className={styles.section}>
-        <h2 className={styles.title}>Nature & Ecology</h2>
+        <h2 className={styles.title}>Beautiful Nature</h2>
         <p className={styles.message}>
           {error || "No photos available."}
         </p>
@@ -142,9 +147,9 @@ function NatureGallery({ locationName = "" }) {
   return (
     <section className={styles.section}>
       <div className={styles.heading}>
-        <h2 className={styles.title}>Nature & Ecology</h2>
+        <h2 className={styles.title}>Beautiful Nature</h2>
         <p className={styles.subtitle}>
-          Discover the beauty of our planet
+          Landscapes and nature around {locationName}
         </p>
       </div>
 
@@ -164,7 +169,6 @@ function NatureGallery({ locationName = "" }) {
                 alt={image.title}
                 loading="lazy"
               />
-
               <span className={styles.caption}>{image.title}</span>
             </button>
           ))}
@@ -214,7 +218,9 @@ function NatureGallery({ locationName = "" }) {
               alt={activeImage.title}
             />
 
-            <p className={styles.viewerTitle}>{activeImage.title}</p>
+            <p className={styles.viewerTitle}>
+              {activeImage.title}
+            </p>
 
             <a
               className={styles.sourceButton}
@@ -246,7 +252,5 @@ function NatureGallery({ locationName = "" }) {
     </section>
   );
 }
-
-
 
 export default NatureGallery;

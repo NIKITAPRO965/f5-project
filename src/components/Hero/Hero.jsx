@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import styles from "./Hero.module.css";
 import { searchLocations } from "../../api/locationSuggestions";
 
-function Hero({ onSearch }) {
+function Hero({ onSearch, onCityChange }) {
   const [city, setCity] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -66,6 +66,7 @@ function Hero({ onSearch }) {
 
   const handleSelectSuggestion = (suggestion) => {
     setCity(suggestion.name);
+    onCityChange?.(suggestion.name);
     setSuggestions([]);
     setShowSuggestions(false);
 
@@ -108,7 +109,10 @@ function Hero({ onSearch }) {
             autoComplete="off"
             value={city}
             onChange={(event) => {
-              setCity(event.target.value);
+              const value = event.target.value;
+
+              setCity(value);
+              onCityChange?.(value);
               setShowSuggestions(true);
             }}
             onFocus={() => setShowSuggestions(true)}
