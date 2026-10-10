@@ -1,0 +1,128 @@
+
+.footer {
+  width: 100%;
+  margin-top: 24px;
+  color: #3b2a1d;
+  background: #ffb36c;
+  border-top: 1px solid rgba(59, 42, 29, 0.15);
+}
+
+.container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  box-sizing: border-box;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo img {
+  display: block;
+  width: 160px;
+  height: auto;
+  object-fit: contain;
+}
+
+.address,
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.address h3,
+.contacts h3 {
+  margin: 0;
+  color: #3b2a1d;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.address p {
+  margin: 0;
+  color: #62452e;
+  font-size: 14px;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #ffffff;
+  background: #62452e;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  font-size: 18px;
+  text-decoration: none;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.socialLink:hover {
+  color: #3b2a1d;
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(59, 42, 29, 0.2);
+}
+
+.socialLink:active {
+  transform: translateY(-1px) scale(0.96);
+}
+
+.socialLink:focus-visible {
+  outline: 2px solid #3b2a1d;
+  outline-offset: 4px;
+}
+
+
+.bottom {
+  padding: 16px 20px;
+  color: #62452e;
+  border-top: 1px solid rgba(59, 42, 29, 0.2);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 28px 16px;
+    text-align: center;
+  }
+
+  .address,
+  .contacts {
+    align-items: center;
+  }
+
+  .socials {
+    justify-content: center;
+  }
+
+  .logo img {
+    width: 140px;
+  }
+}

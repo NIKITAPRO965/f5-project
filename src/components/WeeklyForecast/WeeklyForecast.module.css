@@ -1,0 +1,98 @@
+
+.section {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #ffffff;
+}
+
+.title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 20px 8px;
+  background: #1e2634;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.day {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.temperatures {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.maxTemp {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.minTemp {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+}
+
+@media (min-width: 481px) and (max-width: 1199px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 16px;
+  }
+
+  .title {
+    margin-bottom: 16px;
+    font-size: 21px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .card {
+    gap: 12px;
+    padding: 18px 8px;
+  }
+
+  .day {
+    font-size: 14px;
+  }
+
+  .icon {
+    font-size: 30px;
+  }
+}

@@ -1,0 +1,140 @@
+
+.card {
+  width: 100%;
+  min-width: 0;
+  padding: 24px;
+  color: #ffffff;
+  background: rgba(30, 38, 52, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.card[role="button"] {
+  cursor: pointer;
+}
+
+.card[role="button"]:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.card[role="button"]:focus-visible {
+  outline: 2px solid #f28c38;
+  outline-offset: 3px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.city {
+  overflow: hidden;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.actionButton:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 0;
+}
+
+.icon {
+  font-size: 58px;
+  line-height: 1;
+}
+
+.temperatureBlock {
+  min-width: 0;
+}
+
+.temperature {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.description {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 16px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.details {
+  color: #f5a45e;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .city {
+    font-size: 19px;
+  }
+
+  .weather {
+    gap: 16px;
+    padding: 22px 0;
+  }
+
+  .icon {
+    font-size: 46px;
+  }
+
+  .temperature {
+    font-size: 40px;
+  }
+}

@@ -17,3 +17,47 @@ img{
   width: 100%;
   display: block;
 }
+
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+}
+
+
+.weatherList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+@media (max-width: 480px) {
+  .weatherList {
+    padding: 16px;
+    gap: 16px;
+  }
+}
+
+
+.weatherMessage {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 0 24px;
+  color: #f28c38;
+  text-align: center;
+}
