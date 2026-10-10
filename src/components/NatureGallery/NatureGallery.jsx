@@ -1,208 +1,246 @@
 
 import { useEffect, useState } from "react";
 import styles from "./NatureGallery.module.css";
+import { searchCommonsImages } from "../../api/imageApi";
 
-const images = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1800&q=90",
-    alt: "Mountain lake surrounded by green hills",
-    title: "Mountain landscapes",
-  },
-  {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1800&q=90",
-    alt: "Misty mountains and forest",
-    title: "Misty forests",
-  },
-  {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=90",
-    alt: "Beautiful natural landscape",
-    title: "Beautiful nature",
-  },
-  {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1800&q=90",
-    alt: "Sunlight passing through a forest",
-    title: "Forest trails",
-  },
-];
-
-function NatureGallery() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const previousImage = () => {
-    setActiveIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
-  };
-
-  const nextImage = () => {
-    setActiveIndex((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1
-    );
-  };
+function NatureGallery({ locationName = "" }) {
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
-    if (!isFullscreen) return;
+    let cancelled = false;
+
+    async function loadNatureImages() {
+      setLoading(true);
+      setError("");
+
+      const defaultQuery =
+        "nature OR forest OR ocean OR landscape OR ecology";
+
+      let query = locationName.trim()
+        ? `"${locationName.trim()}" AND (nature OR landscape OR ecology)`
+        : defaultQuery;
+
+      try {
+        let allImages = [];
+        let nextOffset = 0;
+
+        for (let i = 0; i < 5; i++) {
+          let result = await searchCommonsImages(query, nextOffset);
+
+          if (result.images.length === 0 && i === 0 && locationName.trim()) {
+            query = defaultQuery;
+            nextOffset = 0;
+            result = await searchCommonsImages(query, nextOffset);
+          }
+
+          const existingIds = new Set(allImages.map((image) => image.id));
+
+          allImages = [
+            ...allImages,
+            ...result.images.filter((image) => !existingIds.has(image.id)),
+          ].slice(0, 60);
+
+          if (
+            result.nextOffset == null ||
+            result.nextOffset === nextOffset ||
+            allImages.length >= 60
+          ) {
+            break;
+          }
+
+          nextOffset = result.nextOffset;
+        }
+
+        if (cancelled) return;
+
+        setImages(allImages);
+
+        if (allImages.length === 0) {
+          setError("No nature photos found.");
+        }
+      } catch {
+        if (!cancelled) {
+          setError("Unable to load nature photos.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadNatureImages();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [locationName]);
+
+  useEffect(() => {
+    if (activeIndex === null) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setIsFullscreen(false);
-      }
-
-      if (event.key === "ArrowLeft") {
-        previousImage();
+        setActiveIndex(null);
       }
 
       if (event.key === "ArrowRight") {
-        nextImage();
+        setActiveIndex((index) => (index + 1) % images.length);
+      }
+
+      if (event.key === "ArrowLeft") {
+        setActiveIndex(
+          (index) => (index - 1 + images.length) % images.length
+        );
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isFullscreen]);
+  }, [activeIndex, images.length]);
 
-  const activeImage = images[activeIndex];
+  const showPrevious = () => {
+    setActiveIndex((index) => (index - 1 + images.length) % images.length);
+  };
+
+  const showNext = () => {
+    setActiveIndex((index) => (index + 1) % images.length);
+  };
+
+  if (loading) {
+    return (
+      <section className={styles.section}>
+        <h2 className={styles.title}>Nature & Ecology</h2>
+        <p className={styles.message}>Loading nature...</p>
+      </section>
+    );
+  }
+
+  if (error || images.length === 0) {
+    return (
+      <section className={styles.section}>
+        <h2 className={styles.title}>Nature & Ecology</h2>
+        <p className={styles.message}>
+          {error || "No photos available."}
+        </p>
+      </section>
+    );
+  }
+
+  const sliderImages = [...images, ...images];
+  const activeImage =
+    activeIndex === null ? null : images[activeIndex];
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Nature gallery</h2>
+      <div className={styles.heading}>
+        <h2 className={styles.title}>Nature & Ecology</h2>
+        <p className={styles.subtitle}>
+          Discover the beauty of our planet
+        </p>
+      </div>
 
       <div className={styles.slider}>
-        <img
-          className={styles.image}
-          src={activeImage.src}
-          alt={activeImage.alt}
-          onClick={() => setIsFullscreen(true)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              setIsFullscreen(true);
-            }
-          }}
-          aria-label="Open image fullscreen"
-        />
+        <div className={styles.track}>
+          {sliderImages.map((image, index) => (
+            <button
+              className={styles.slide}
+              type="button"
+              key={`${image.id}-${index}`}
+              onClick={() => setActiveIndex(index % images.length)}
+              aria-label={`View ${image.title}`}
+            >
+              <img
+                className={styles.image}
+                src={image.url}
+                alt={image.title}
+                loading="lazy"
+              />
 
-        <button
-          className={`${styles.arrow} ${styles.previous}`}
-          type="button"
-          onClick={previousImage}
-          aria-label="Previous image"
-        >
-          &#10094;
-        </button>
-
-        <button
-          className={`${styles.arrow} ${styles.next}`}
-          type="button"
-          onClick={nextImage}
-          aria-label="Next image"
-        >
-          &#10095;
-        </button>
-
-        <div className={styles.caption}>
-          {activeImage.title}
+              <span className={styles.caption}>{image.title}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className={styles.dots}>
-        {images.map((image, index) => (
-          <button
-            key={image.id}
-            className={`${styles.dot} ${
-              index === activeIndex ? styles.activeDot : ""
-            }`}
-            type="button"
-            onClick={() => setActiveIndex(index)}
-            aria-label={`Show image ${index + 1}`}
-            aria-pressed={index === activeIndex}
-          />
-        ))}
-      </div>
+      <p className={styles.attribution}>
+        Photos from Wikimedia Commons. Click an image to view it.
+      </p>
 
-      {isFullscreen && (
+      {activeImage && (
         <div
           className={styles.lightbox}
-          onClick={() => setIsFullscreen(false)}
+          onClick={() => setActiveIndex(null)}
           role="dialog"
           aria-modal="true"
-          aria-label="Fullscreen nature gallery"
+          aria-label="Photo viewer"
         >
           <button
             className={styles.closeButton}
             type="button"
-            onClick={() => setIsFullscreen(false)}
-            aria-label="Close fullscreen"
+            onClick={() => setActiveIndex(null)}
+            aria-label="Close photo viewer"
           >
-            &times;
+            ×
           </button>
 
           <button
-            className={`${styles.arrow} ${styles.modalPrevious}`}
+            className={`${styles.navButton} ${styles.previousButton}`}
             type="button"
             onClick={(event) => {
               event.stopPropagation();
-              previousImage();
+              showPrevious();
             }}
             aria-label="Previous image"
           >
-            &#10094;
-          </button>
-
-          <img
-            className={styles.fullscreenImage}
-            src={activeImage.src}
-            alt={activeImage.alt}
-            onClick={(event) => event.stopPropagation()}
-          />
-
-          <button
-            className={`${styles.arrow} ${styles.modalNext}`}
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              nextImage();
-            }}
-            aria-label="Next image"
-          >
-            &#10095;
+            ‹
           </button>
 
           <div
-            className={styles.fullscreenFooter}
+            className={styles.viewer}
             onClick={(event) => event.stopPropagation()}
           >
-            <p className={styles.fullscreenTitle}>
-              {activeImage.title}
-            </p>
+            <img
+              className={styles.viewerImage}
+              src={activeImage.url}
+              alt={activeImage.title}
+            />
 
-            <div className={styles.dots}>
-              {images.map((image, index) => (
-                <button
-                  key={image.id}
-                  className={`${styles.dot} ${
-                    index === activeIndex ? styles.activeDot : ""
-                  }`}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`Show image ${index + 1}`}
-                  aria-pressed={index === activeIndex}
-                />
-              ))}
-            </div>
+            <p className={styles.viewerTitle}>{activeImage.title}</p>
+
+            <a
+              className={styles.sourceButton}
+              href={activeImage.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Visit source
+            </a>
+
+            <p className={styles.counter}>
+              {activeIndex + 1} / {images.length}
+            </p>
           </div>
+
+          <button
+            className={`${styles.navButton} ${styles.nextButton}`}
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              showNext();
+            }}
+            aria-label="Next image"
+          >
+            ›
+          </button>
         </div>
       )}
     </section>

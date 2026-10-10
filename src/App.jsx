@@ -251,8 +251,13 @@ function App() {
           </>
         )}
 
-        <News />
-        <NatureGallery />
+        <News
+        locationName={selectedWeather?.location.name || ""}
+        />
+
+        <NatureGallery
+        locationName={selectedWeather?.location.name || ""}
+        />
       </main>
 
       <Footer />

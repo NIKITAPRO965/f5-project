@@ -1,71 +1,192 @@
+
+import { useEffect, useState } from "react";
 import styles from "./News.module.css";
+import { searchCommonsImages } from "../../api/imageApi";
 
-const news = [
-  {
-    id: 1,
-    title: "How weather affects our daily lives",
-    description:
-      "Discover how changing weather conditions influence our everyday activities.",
-    image:
-      "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=800&q=80",
-    date: "Today",
-  },
-  {
-    id: 2,
-    title: "Understanding climate change",
-    description:
-      "Learn about climate patterns and the changes happening around the world.",
-    image:
-      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
-    date: "Yesterday",
-  },
-  {
-    id: 3,
-    title: "Beautiful places in nature",
-    description:
-      "Explore amazing natural landscapes and the beauty of our planet.",
-    image:
-      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=800&q=80",
-    date: "2 days ago",
-  },
-  {
-  id: 4,
-  title: "The importance of weather forecasts",
-  description:
-    "Weather forecasts help us plan our activities and prepare for changing conditions.",
-  image:
-    "https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=800&q=80",
-  date: "3 days ago",
-  },
-];
+const PAGE_SIZE = 4;
 
-function News({ data = news }) {
+function News({ locationName = "" }) {
+  const [images, setImages] = useState([]);
+  const [offset, setOffset] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [activeQuery, setActiveQuery] = useState(
+    "cats OR dogs OR pets OR animals"
+  );
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAnimals() {
+      setLoading(true);
+      setError("");
+      setImages([]);
+      setOffset(null);
+      setVisibleCount(PAGE_SIZE);
+
+      const query = locationName.trim()
+        ? `"${locationName.trim()}" AND (animals OR wildlife OR pets)`
+        : "cats OR dogs OR pets OR animals";
+
+      try {
+        let result = await searchCommonsImages(query);
+        let usedQuery = query;
+
+        if (result.images.length === 0 && locationName.trim()) {
+          usedQuery = "cats OR dogs OR pets OR animals";
+          result = await searchCommonsImages(usedQuery);
+        }
+
+        if (cancelled) return;
+
+        setImages(result.images);
+        setOffset(result.nextOffset);
+        setActiveQuery(usedQuery);
+
+        if (result.images.length === 0) {
+          setError("No animal photos found.");
+        }
+      } catch {
+        if (!cancelled) {
+          setError("Unable to load animal photos.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadAnimals();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [locationName]);
+
+  const handleLoadMore = async () => {
+    if (loadingMore) return;
+
+    // Если уже загруженные изображения скрыты,
+    // сначала показываем следующие 4.
+    if (visibleCount < images.length) {
+      setVisibleCount((count) =>
+        Math.min(count + PAGE_SIZE, images.length)
+      );
+      return;
+    }
+
+    if (offset === null) return;
+
+    setLoadingMore(true);
+    setError("");
+
+    try {
+      const result = await searchCommonsImages(activeQuery, offset);
+
+      setImages((previous) => {
+        const existingIds = new Set(previous.map((image) => image.id));
+
+        return [
+          ...previous,
+          ...result.images.filter((image) => !existingIds.has(image.id)),
+        ];
+      });
+
+      setOffset(result.nextOffset);
+
+      if (result.images.length === 0) {
+        setError("No more photos found.");
+      } else {
+        setVisibleCount((count) => count + PAGE_SIZE);
+      }
+    } catch {
+      setError("Unable to load more photos.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const handleClear = () => {
+    setVisibleCount(PAGE_SIZE);
+    setError("");
+  };
+
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Latest news</h2>
+      <h2 className={styles.title}>Animal Gallery</h2>
 
-      <div className={styles.grid}>
-        {data.map((item) => (
-          <article className={styles.card} key={item.id}>
-            <img
-              className={styles.image}
-              src={item.image}
-              alt=""
-              loading="lazy"
-            />
+      <p className={styles.subtitle}>
+        {locationName
+          ? `Animals and wildlife near ${locationName}`
+          : "Discover amazing animals from around the world"}
+      </p>
 
-            <div className={styles.content}>
-              <p className={styles.date}>{item.date}</p>
+      {loading && <p className={styles.message}>Loading animals...</p>}
 
-              <h3 className={styles.cardTitle}>{item.title}</h3>
+      {error && <p className={styles.message}>{error}</p>}
 
-              <p className={styles.description}>
-                {item.description}
-              </p>
-            </div>
-          </article>
-        ))}
-      </div>
+      {!loading && images.length > 0 && (
+        <>
+          <div className={styles.grid}>
+            {images.slice(0, visibleCount).map((image) => (
+              <article className={styles.card} key={image.id}>
+                <a
+                  className={styles.imageLink}
+                  href={image.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img
+                    className={styles.image}
+                    src={image.url}
+                    alt={image.title}
+                    loading="lazy"
+                  />
+                </a>
+
+                <div className={styles.caption}>
+                  <p className={styles.imageTitle}>{image.title}</p>
+
+                  <a
+                    className={styles.sourceLink}
+                    href={image.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Image source
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className={styles.actions}>
+            {(visibleCount > PAGE_SIZE || images.length > PAGE_SIZE) && (
+              <button
+                className={styles.clearButton}
+                type="button"
+                onClick={handleClear}
+              >
+                Clear
+              </button>
+            )}
+
+            {(visibleCount < images.length || offset !== null) && (
+              <button
+                className={styles.loadMore}
+                type="button"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? "Loading..." : "Load more"}
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </section>
   );
 }
