@@ -247,4 +247,6 @@ function NatureGallery({ locationName = "" }) {
   );
 }
 
+
+
 export default NatureGallery;
