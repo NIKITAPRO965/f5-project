@@ -1,5 +1,6 @@
 
 .section {
+  box-sizing: border-box;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
@@ -58,6 +59,7 @@
   overflow-wrap: anywhere;
 }
 
+/* Мобильные устройства: 2 колонки */
 @media (max-width: 480px) {
   .section {
     padding: 16px;
@@ -68,20 +70,26 @@
   }
 
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
   .card {
-    padding: 16px;
+    gap: 8px;
+    padding: 14px 8px;
   }
 
   .icon {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .label {
+    margin-bottom: 6px;
+    font-size: 12px;
   }
 
   .value {
-    font-size: 20px;
+    font-size: 17px;
   }
 }
