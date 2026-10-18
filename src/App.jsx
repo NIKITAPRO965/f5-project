@@ -192,8 +192,11 @@ function App() {
 
       <main>
         <Hero
-          onSearch={handleSearch}
-          onCityChange={setSearchCity}
+        onSearch={handleSearch}
+        onCityChange={setSearchCity}
+        weatherType={
+        selectedWeather?.weather.weather[0].main || "Clear"
+        }
         />
 
         {loading && (

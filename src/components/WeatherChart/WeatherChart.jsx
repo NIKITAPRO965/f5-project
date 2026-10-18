@@ -10,32 +10,39 @@ import {
 } from "recharts";
 import styles from "./WeatherChart.module.css";
 
-const fallbackForecast = [
-  { time: "Now", temperature: 18 },
-  { time: "13:00", temperature: 19 },
-  { time: "14:00", temperature: 21 },
-  { time: "15:00", temperature: 22 },
-  { time: "16:00", temperature: 20 },
-  { time: "17:00", temperature: 18 },
-  { time: "18:00", temperature: 16 },
-  { time: "19:00", temperature: 15 },
-];
+function WeatherChart({ data = [] }) {
+  if (!data.length) {
+    return (
+      <section className={styles.section}>
+        <h2 className={styles.title}>Hourly forecast</h2>
+        <div className={styles.card}>
+          <p>Hourly forecast is not available.</p>
+        </div>
+      </section>
+    );
+  }
 
-function WeatherChart({ data = fallbackForecast }) {
   return (
     <section className={styles.section}>
       <h2 className={styles.title}>Hourly forecast</h2>
 
       <div className={styles.card}>
         <div className={styles.forecast}>
-          {data.map((item) => (
-            <div className={styles.forecastItem} key={item.time}>
-              <span className={styles.time}>{item.time}</span>
+          {data.map((item, index) => (
+            <div
+              className={styles.forecastItem}
+              key={`${item.time}-${index}`}
+            >
+              <span className={styles.time}>
+                {index === 0 ? "Now" : item.time}
+              </span>
+
               <span className={styles.weatherIcon}>
                 {item.icon || "⛅"}
               </span>
+
               <span className={styles.temperature}>
-                {item.temperature}°
+                {Math.round(item.temperature)}°
               </span>
             </div>
           ))}
@@ -45,7 +52,12 @@ function WeatherChart({ data = fallbackForecast }) {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={data}
-              margin={{ top: 12, right: 12, bottom: 0, left: 12 }}
+              margin={{
+                top: 12,
+                right: 12,
+                bottom: 0,
+                left: 12,
+              }}
             >
               <CartesianGrid
                 stroke="rgba(255,255,255,0.1)"
@@ -66,7 +78,10 @@ function WeatherChart({ data = fallbackForecast }) {
                   borderRadius: "8px",
                   color: "#ffffff",
                 }}
-                formatter={(value) => [`${value}°C`, "Temperature"]}
+                formatter={(value) => [
+                  `${value}°C`,
+                  "Temperature",
+                ]}
                 labelStyle={{ color: "#ffffff" }}
               />
 

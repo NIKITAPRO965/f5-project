@@ -3,7 +3,28 @@ import { useState, useEffect } from "react";
 import styles from "./Hero.module.css";
 import { searchLocations } from "../../api/locationSuggestions";
 
-function Hero({ onSearch, onCityChange }) {
+const getWeatherVideo = (weatherType) => {
+  const type = (weatherType || "").toLowerCase();
+
+  if (["rain", "drizzle"].includes(type)) return "rain.mp4";
+  if (type === "clouds") return "clouds.mp4";
+  if (type === "snow") return "snow.mp4";
+  if (type === "thunderstorm") return "thunderstorm.mp4";
+
+  if (
+    ["mist", "fog", "haze", "smoke", "dust"].includes(type)
+  ) {
+    return "mist.mp4";
+  }
+
+  return "clear.mp4";
+};
+
+function Hero({
+  onSearch,
+  onCityChange,
+  weatherType = "Clear",
+}) {
   const [city, setCity] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -20,6 +41,8 @@ function Hero({ onSearch, onCityChange }) {
     day: "numeric",
     month: "long",
   });
+
+  const videoSrc = `${import.meta.env.BASE_URL}videos/${getWeatherVideo(weatherType)}`;
 
   useEffect(() => {
     const query = city.trim();
@@ -79,6 +102,23 @@ function Hero({ onSearch, onCityChange }) {
 
   return (
     <section className={styles.hero}>
+      <video
+        key={videoSrc}
+        className={styles.videoBackground}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+        onError={(event) => {
+          event.currentTarget.style.display = "none";
+        }}
+      >
+        <source src={videoSrc} type="video/mp4" />
+      </video>
+
+      <div className={styles.weatherOverlay} aria-hidden="true" />
+
       <div className={styles.content}>
         <h1 className={styles.title}>Weather dashboard</h1>
 
@@ -110,7 +150,6 @@ function Hero({ onSearch, onCityChange }) {
             value={city}
             onChange={(event) => {
               const value = event.target.value;
-
               setCity(value);
               onCityChange?.(value);
               setShowSuggestions(true);
