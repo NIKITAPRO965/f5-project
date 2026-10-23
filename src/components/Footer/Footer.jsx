@@ -8,6 +8,8 @@ import {
 
 import styles from "./Footer.module.css";
 
+const logoUrl = `${import.meta.env.BASE_URL}images/logo.svg`;
+
 function Footer() {
   const socialLinks = [
     {
@@ -35,13 +37,17 @@ function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
-        <a href="#" className={styles.logo} aria-label="Home">
-        <img src="https://www.figma.com/api/mcp/asset/c81f831c-3829-4601-9a67-91c005b2fc43.png" alt="Logo"/>
+        <a href="#home" className={styles.logo} aria-label="Home">
+          <img src={logoUrl} alt="Logo" />
         </a>
 
         <div className={styles.address}>
-          <h3>Address</h3>
-          <p>Ваш адрес будет здесь</p>
+        <h3>Address</h3>
+        <p>
+        Svobody str. 35
+        <br />
+        Kyiv Ukraine
+        </p>
         </div>
 
         <div className={styles.contacts}>

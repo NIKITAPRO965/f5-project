@@ -3,11 +3,8 @@ import { useState, useEffect } from "react";
 import styles from "./Header.module.css";
 import Modal from "../Modal/Modal";
 
-const logoUrl =
-  "https://www.figma.com/api/mcp/asset/c81f831c-3829-4601-9a67-91c005b2fc43.png";
-
-const userUrl =
-  "https://www.figma.com/api/mcp/asset/5d4d2b75-de1f-4f88-a01b-f0f73c076a26.png";
+const logoUrl = `${import.meta.env.BASE_URL}images/logo.svg`;
+const userUrl = `${import.meta.env.BASE_URL}images/profile.png`;
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,7 +22,6 @@ function Header() {
     }
   });
 
-  // Закрытие окон по Escape
   useEffect(() => {
     if (!isModalOpen && !isProfileOpen) return;
 
@@ -51,21 +47,18 @@ function Header() {
     setIsMenuOpen(false);
   };
 
-  // Регистрация
   const handleRegister = (newUser) => {
     localStorage.setItem("user", JSON.stringify(newUser));
     setUser(newUser);
     setIsModalOpen(false);
   };
 
-  // Выход из аккаунта
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
     setIsProfileOpen(false);
   };
 
-  // Нажатие на иконку профиля
   const handleProfileClick = () => {
     setIsMenuOpen(false);
 
@@ -76,7 +69,6 @@ function Header() {
     }
   };
 
-  // Закрытие профиля по клику на фон
   const handleProfileBackdropClick = (event) => {
     if (event.target === event.currentTarget) {
       setIsProfileOpen(false);
@@ -163,7 +155,6 @@ function Header() {
         </div>
       </div>
 
-      {/* Окно регистрации */}
       {isModalOpen && (
         <Modal
           onClose={() => setIsModalOpen(false)}
@@ -171,7 +162,6 @@ function Header() {
         />
       )}
 
-      {/* Окно профиля */}
       {isProfileOpen && user && (
         <div
           className={styles.profileBackdrop}
@@ -221,4 +211,3 @@ function Header() {
 }
 
 export default Header;
-
